@@ -45,23 +45,39 @@ def get_dealers_from_cf(url, **kwargs):
                                    short_name=dealer_doc["short_name"],
                                    st=dealer_doc["st"], zip=dealer_doc["zip"])
             results.append(dealer_obj)
-
     return results
 
 # get_dealer_by_id_from_cf function uses ibm cloud function to get dealer by id
 def get_dealer_by_id_from_cf(url, dealerId):
-    dealers = get_request(url, dealerId=dealerId)
+    dealer = get_request(url, id=dealerId)
+    print(dealer)
+    if dealer:
+        # Create a CarDealer object with values in `dealer` object
+        return CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
+                         id=dealer["id"], lat=dealer["lat"], long=dealer["long"],
+                         short_name=dealer["short_name"],
+                         st=dealer["st"], zip=dealer["zip"])
+
+# get_dealer_by_state_from_cf function uses ibm cloud function to get a list of dealers by state
+def get_dealer_by_state_from_cf(url, state):
+    results = []
+    dealers = get_request(url, st=state)
+    print("dealers by state list:")
+    print(dealers)
+    print("")
     if dealers:
-        # For each dealer object
+        # Iterate through dealers list
         for dealer in dealers:
-            # Get its content in `doc` object
-            dealer_doc = dealer["doc"]
-            # Create a CarDealer object with values in `doc` object
-            if dealer_doc["id"] == dealerId:
-                return CarDealer(address=dealer_doc["address"], city=dealer_doc["city"], full_name=dealer_doc["full_name"],
-                                 id=dealer_doc["id"], lat=dealer_doc["lat"], long=dealer_doc["long"],
-                                 short_name=dealer_doc["short_name"],
-                                 st=dealer_doc["st"], zip=dealer_doc["zip"])
+            print("Dealer from state:")
+            print(dealer)
+            print("")
+            # Create CarDealer object with values from `dealer` object
+            dealer_obj = CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
+                                   id=dealer["id"], lat=dealer["lat"], long=dealer["long"],
+                                   short_name=dealer["short_name"],
+                                   st=dealer["st"], zip=dealer["zip"])
+            results.append(dealer_obj)
+        return results
 
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
 # def get_dealer_by_id_from_cf(url, dealerId):
