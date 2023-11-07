@@ -92,10 +92,10 @@ def get_dealerships(request):
         return HttpResponse(dealer_names)
 
 # Create `get_dealer_by_id` to get dealer with a particular id
-def get_dealer_by_id(request, dealerId):
+def get_dealer_by_id(request, dealer_id):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
-        dealership = get_dealer_by_id_from_cf(url, dealerId)
+        dealership = get_dealer_by_id_from_cf(url, dealer_id)
         dealer_name = dealership.short_name
         return HttpResponse(dealer_name)
 
@@ -116,7 +116,7 @@ def get_dealer_details(request, dealer_id):
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-review"
         dealer_reviews = get_dealer_reviews_from_cf(url, dealer_id)
         print(dealer_reviews)
-        review_content = ' '.join(dealer.review for dealer in dealer_reviews)
+        review_content = ' '.join(dealer.sentiment for dealer in dealer_reviews)
         return HttpResponse(review_content)
 
 # Create a `add_review` view to submit a review
