@@ -134,31 +134,44 @@ def get_dealer_details(request, dealer_id):
 # def add_review(request, dealer_id):
 def add_review(request, dealer_id):
     # if request.user.is_authenticated:
-    url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/post-review"
     print("TP 1")
     print({"request method": request.method})
     context = dict()
+    dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
+    dealer = get_dealer_by_id_from_cf(dealer_url, dealer_id)
+    context["dealer"] = dealer
+    # print("Request: ", request)
     if request.method == "GET":
         context["cars"] = CarModel.objects.filter(dealer_id=dealer_id)
         print("Cars context: ", context["cars"])
+        print("Car objects id: ", context["cars"][6].id)
         context["dealer_id"] = dealer_id
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == "POST":
         print("TP 2")
+        print("Request POST: ",request.POST) 
+        review_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/post-review"
+        car_id = request.POST["car"]
+        purchase_check = False
+        if "purchase_check" in request.POST:
+            if request.POST["purchase_check"] == 'on':
+                purchase_check = True
         review = {
-            time: datetime.utcnow().isoformat(),
-            name: request.POST['name'],
-            dealership: dealer_id,
-            review: request.POST['review'],
-            purchase: request.POST['purchase'],
-            purchase_date: request.POST['purchase_date'],
-            car_make: request.POST["car_make"],
-            car_model: request.POST["car_model"],
-            car_year: request.POST["car_year"]
+            "time": datetime.utcnow().isoformat(),
+            "name": request.user.username,
+            "dealership": dealer_id,
+            "review": request.POST['review'],
+            "purchase": purchase_check,
+            "purchase_date": request.POST['purchase_date'],
+            "car_make": CarModel.objects.get(id=car_id).car_make.make_name,
+            "car_model": CarModel.objects.get(id=car_id).model_name,
+            "car_year": CarModel.objects.get(id=car_id).year
         }
         json_payload = {"review": review}
         print("Test 1")
-        response = post_request(url, json_payload=json_payload, kwargs=kwargs)
-        print("Test 2")
-        status_code = response.status_code
+        response = post_request(review_url, json_payload=json_payload)
+        print("Test 2") 
+        print("Response: ", response)
         return HttpResponse("Hello")
+
+
