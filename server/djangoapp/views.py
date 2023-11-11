@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
@@ -173,6 +173,6 @@ def add_review(request, dealer_id):
         response = post_request(review_url, json_payload=json_payload)
         print("Test 2") 
         print("Response: ", response)
-        return HttpResponse("Hello")
+        return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
 
 

@@ -102,12 +102,16 @@ def get_dealer_reviews_from_cf(url, dealer_id):
         print(dealers)
         # Get list from docs
         review_docs = dealers["data"]["docs"]
+        print("Displaying review_docs: ")
+        print(review_docs)
         # iterate through list of reviews
         for review in review_docs:
             review_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"],
                                       review=review["review"], purchase_date=review["purchase_date"], 
                                       car_make=review["car_make"], car_model=review["car_model"], 
-                                      car_year=review["car_year"], sentiment="sentiment", id=review["id"])
+                                      car_year=review["car_year"], sentiment="sentiment", id=dealer_id)
+            print("Review object: ")
+            print(review_obj.review)
             review_obj.sentiment = analyze_review_sentiments(review_obj.review)
             results.append(review_obj)
         return results
