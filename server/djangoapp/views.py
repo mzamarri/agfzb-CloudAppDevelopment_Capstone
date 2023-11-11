@@ -156,6 +156,7 @@ def add_review(request, dealer_id):
         if "purchase_check" in request.POST:
             if request.POST["purchase_check"] == 'on':
                 purchase_check = True
+        car = CarModel.objects.get(id=car_id)
         review = {
             "time": datetime.utcnow().isoformat(),
             "name": request.user.username,
@@ -163,9 +164,9 @@ def add_review(request, dealer_id):
             "review": request.POST['review'],
             "purchase": purchase_check,
             "purchase_date": request.POST['purchase_date'],
-            "car_make": CarModel.objects.get(id=car_id).car_make.make_name,
-            "car_model": CarModel.objects.get(id=car_id).model_name,
-            "car_year": CarModel.objects.get(id=car_id).year
+            "car_make": car.car_make.make_name,
+            "car_model": car.model_name,
+            "car_year": str(car.year)
         }
         json_payload = {"review": review}
         print("Test 1")
