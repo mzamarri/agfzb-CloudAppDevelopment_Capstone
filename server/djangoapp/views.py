@@ -123,11 +123,13 @@ def get_dealer_details(request, dealer_id):
         dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
         dealer = get_dealer_by_id_from_cf(dealer_url, dealer_id)
         context["dealer"] = dealer
+        print("Dealer: ", context["dealer"])
         review_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-review"
         reviews = get_dealer_reviews_from_cf(review_url, dealer_id)
         context["reviews"] = reviews
         context["dealer_id"] = dealer_id
         print("Test Point 1")
+        print("Context: ", context)
         # review_content = ' '.join(dealer.sentiment for dealer in dealer_reviews)
         return render(request, 'djangoapp/dealer_details.html', context)
 
@@ -167,7 +169,7 @@ def add_review(request, dealer_id):
             "purchase_date": request.POST['purchase_date'],
             "car_make": car.car_make.make_name,
             "car_model": car.model_name,
-            "car_year": str(car.year)
+            "car_year": str(car.year.strftime("%Y")) 
         }
         json_payload = {"review": review}
         print("Test 1")
