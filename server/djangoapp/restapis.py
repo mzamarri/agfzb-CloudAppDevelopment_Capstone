@@ -6,6 +6,7 @@ from .models import CarDealer, DealerReview
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
+from ibm_cloud_sdk_core.base_service import ApiException
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
@@ -63,6 +64,7 @@ def get_dealers_from_cf(url, **kwargs):
 # get_dealer_by_id_from_cf function uses ibm cloud function to get dealer by id
 def get_dealer_by_id_from_cf(url, dealer_id):
     dealer = get_request(url, id=dealer_id)
+    print("Dealer", dealer)
     if dealer:
         # Create a CarDealer object with values in `dealer` object
         return CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
@@ -126,6 +128,11 @@ def analyze_review_sentiments(dealer_review):
     authenticator = IAMAuthenticator(api_key)
     natural_language_understanding = NaturalLanguageUnderstandingV1(version='2022-04-07', authenticator=authenticator)
     natural_language_understanding.set_service_url(url)
-    response = natural_language_understanding.analyze(text=dealer_review, features=Features(sentiment=SentimentOptions(targets=[dealer_review]))).get_result()
-    label = response['sentiment']['document']['label']
-    return label
+    try:
+        response = natural_language_understanding.analyze(text=dealer_review, features=Features(sentiment=SentimentOptions(targets=[dealer_review]))).get_result()
+        label = response['sentiment']['document']['label']
+        return label
+    except ApiException:
+        print("API Exception")
+    except:
+        print("An exception occured")

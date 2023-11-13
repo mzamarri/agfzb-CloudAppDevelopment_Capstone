@@ -127,6 +127,7 @@ def get_dealer_details(request, dealer_id):
         reviews = get_dealer_reviews_from_cf(review_url, dealer_id)
         context["reviews"] = reviews
         context["dealer_id"] = dealer_id
+        print("Test Point 1")
         # review_content = ' '.join(dealer.sentiment for dealer in dealer_reviews)
         return render(request, 'djangoapp/dealer_details.html', context)
 
