@@ -133,6 +133,7 @@ def analyze_review_sentiments(dealer_review):
         label = response['sentiment']['document']['label']
         return label
     except ApiException:
-        print("API Exception")
+        print("An API exception occured")
+        return None
     except:
         print("An exception occured")

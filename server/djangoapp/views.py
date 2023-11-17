@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
 from .restapis import get_dealers_from_cf, get_dealer_by_id_from_cf, get_dealer_by_state_from_cf, \
-                      get_dealer_reviews_from_cf, post_request
+                      get_dealer_reviews_from_cf, post_request, analyze_review_sentiments
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -139,20 +139,31 @@ def add_review(request, dealer_id):
     # if request.user.is_authenticated:
     print("TP 1")
     print({"request method": request.method})
-    context = dict()
+    print("User authenticated? ", request.user.is_authenticated)
+    if not request.user.is_authenticated:
+        return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+    context = dict(sentiment_passed=True)
     dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
     dealer = get_dealer_by_id_from_cf(dealer_url, dealer_id)
     context["dealer"] = dealer
+    context["dealer_id"] = dealer_id
     # print("Request: ", request)
     if request.method == "GET":
         context["cars"] = CarModel.objects.filter(dealer_id=dealer_id)
         print("Cars context: ", context["cars"])
         print("Car objects id: ", context["cars"][6].id)
-        context["dealer_id"] = dealer_id
+        print("context: ", context["sentiment_passed"])
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == "POST":
         print("TP 2")
-        print("Request POST: ",request.POST) 
+        print("Request POST: ", request.POST)
+        check_review_sentiment = analyze_review_sentiments(request.POST['review'])
+        if check_review_sentiment is None:
+            print("Review sentiment cannot be determined from text. Might be eligible. Please retype review")
+            context["sentiment_passed"] = False
+            context["cars"] = CarModel.objects.filter(dealer_id=dealer_id)
+            print("context: ", context)
+            return render(request, "djangoapp/add_review.html", context)
         review_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/post-review"
         car_id = request.POST["car"]
         purchase_check = False
@@ -177,5 +188,3 @@ def add_review(request, dealer_id):
         print("Test 2") 
         print("Response: ", response)
         return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
-
-
