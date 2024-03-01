@@ -21,8 +21,10 @@ def get_request(url, **kwargs):
     except:
         # If any error occurs
         print("Network exception occurred")
-    status_code = response.status_code
+    status_code = response.status_code 
+    print("response: " + str(dir(response)))
     print("With status {} ".format(status_code))
+    print("response-attribute: " + str(response.text))
     json_data = json.loads(response.text)
     return json_data
 
@@ -47,10 +49,12 @@ def post_request(url, json_payload, **kwargs):
 def get_dealers_from_cf(url, **kwargs):
     results = []
     # Call get_request with a URL parameter
-    dealers = get_request(url)
+    dealers = get_request(url)['result']
+    print("dealers list: " + str(dealers))
     if dealers:
         # For each dealer object
         for dealer in dealers:
+            print("Dealer: " + str(dealer))
             # Get its content in `doc` object
             dealer_doc = dealer["doc"]
             # Create a CarDealer object with values in `doc` object
@@ -64,7 +68,7 @@ def get_dealers_from_cf(url, **kwargs):
 # get_dealer_by_id_from_cf function uses ibm cloud function to get dealer by id
 def get_dealer_by_id_from_cf(url, dealer_id):
     dealer = get_request(url, id=dealer_id)
-    print("Dealer", dealer)
+    print("Dealer:", dealer)
     if dealer:
         # Create a CarDealer object with values in `dealer` object
         return CarDealer(address=dealer["address"], city=dealer["city"], full_name=dealer["full_name"],
