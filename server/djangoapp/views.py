@@ -86,9 +86,10 @@ def registration_request(request):
 def get_dealerships(request):
     context = dict()
     if request.method == "GET":
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
+        url = "https://get-dealerships.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
+        print("Deakership list: ", dealerships)
         print("Dealership ID: ", dealerships[0])
         print("Dealership ID end")
         context["dealership_list"] = dealerships
@@ -99,7 +100,7 @@ def get_dealerships(request):
 # Create `get_dealer_by_id` to get dealer with a particular id
 def get_dealer_by_id(request, dealer_id):
     if request.method == "GET":
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
+        url = "https://get-dealerships.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
         dealership = get_dealer_by_id_from_cf(url, dealer_id)
         dealer_name = dealership.short_name
         return HttpResponse(dealer_name)
@@ -107,7 +108,7 @@ def get_dealer_by_id(request, dealer_id):
 # Create a `get_dealer_details_by_state` view to render the reviews of a dealer in particular state
 def get_dealers_by_state(request, state):
     if request.method == "GET":
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
+        url = "https://get-dealerships.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
         dealership_from_state = get_dealer_by_state_from_cf(url, state)
         print("Dealership by state:")
         print(dealership_from_state[0])
@@ -120,11 +121,11 @@ def get_dealer_details(request, dealer_id):
     context = dict()
     print("Dealer ID: ", dealer_id)
     if request.method == "GET":
-        dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
+        dealer_url = "https://get-dealerships.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
         dealer = get_dealer_by_id_from_cf(dealer_url, dealer_id)
         context["dealer"] = dealer
         print("Dealer: ", context["dealer"])
-        review_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-review"
+        review_url = "https://get-reveiew.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
         reviews = get_dealer_reviews_from_cf(review_url, dealer_id)
         context["reviews"] = reviews
         context["dealer_id"] = dealer_id
@@ -143,7 +144,7 @@ def add_review(request, dealer_id):
     if not request.user.is_authenticated:
         return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
     context = dict(sentiment_passed=True)
-    dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/get-dealership"
+    dealer_url = "https://get-dealerships.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
     dealer = get_dealer_by_id_from_cf(dealer_url, dealer_id)
     context["dealer"] = dealer
     context["dealer_id"] = dealer_id
@@ -164,7 +165,7 @@ def add_review(request, dealer_id):
             context["cars"] = CarModel.objects.filter(dealer_id=dealer_id)
             print("context: ", context)
             return render(request, "djangoapp/add_review.html", context)
-        review_url = "https://us-south.functions.appdomain.cloud/api/v1/web/e336f8e9-8c1c-4218-b880-1680d9a739fc/dealership-package/post-review"
+        review_url = "https://post-review.1dps8ljw5lt5.us-south.codeengine.appdomain.cloud"
         car_id = request.POST["car"]
         purchase_check = False
         if "purchase_check" in request.POST:
